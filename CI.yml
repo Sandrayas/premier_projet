@@ -1,0 +1,33 @@
+#fichier qui sert à automatiser le test 
+#quand je ferai un push il va executer toutes 
+#les lignes qu on lui a donnné 
+name: CI
+on: [push]
+jobs: 
+  test_build_run_push:
+    #on va lui dire qu on va run sur ubuntu 
+    #là c est juste notre code 
+    #qui arrive sur github et on lui dit comment runner 
+    #le code 
+    runs-on: ubuntu-latest
+    steps: 
+    #cette ligne est utile si on veut se connecter àun docker
+      - uses: actions/checkout@v2
+      - name: Run tests
+        #la barre | permet de run plusieurs lignes en meme temps
+        run : |
+          pip install pytest 
+          pytest
+      - name: build docker image
+        run: 
+          docker build -t valid_password .
+      - name: run docker image
+        run:
+          docker run valid_password
+      - name: docker login
+        env: 
+          DOCKER_USER: ${{secrets.DOCKER_USERNAME}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_USERNAME}}
+
+        run: docker login -u $DOCKER_USER
+           docker run valid_password
